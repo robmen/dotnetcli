@@ -76,7 +76,7 @@ namespace Microsoft.Extensions.DependencyModel
 
         private bool TryResolveAssemblyFile(string basePath, string assemblyPath, out string fullName)
         {
-            fullName = Path.Combine(basePath, assemblyPath, Version);
+            fullName = Path.Combine(basePath, assemblyPath);
             if (File.Exists(fullName))
             {
                 return true;
