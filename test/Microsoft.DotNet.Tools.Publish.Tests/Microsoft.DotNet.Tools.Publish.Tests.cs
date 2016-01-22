@@ -157,6 +157,32 @@ namespace Microsoft.DotNet.Tools.Publish.Tests
             publishCommand.GetOutputDirectory().Should().HaveFile("Newtonsoft.Json.dll");
         }
 
+        public void RefsPublishTest()
+        {
+            // create unique directories in the 'temp' folder
+            var root = Temp.CreateDirectory();
+            var testLibDir = root.CreateDirectory("TestAppCompilationContext");
+
+            //copy projects to the temp dir
+            CopyProjectToTempDir(Path.Combine(_testProjectsRoot, "TestAppCompilationContext"), testLibDir);
+
+            RunRestore(testLibDir.Path);
+
+            var testProject = GetProjectPath(testLibDir);
+            var publishCommand = new PublishCommand(testProject);
+            publishCommand.Execute().Should().Pass();
+
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestAppCompilationContext.dll");
+            publishCommand.GetOutputDirectory().Should().HaveFile("TestLibrary.dll");
+
+            var refsDirectory = new DirectoryInfo(Path.Combine(publishCommand.GetOutputDirectory().FullName, "refs"));
+            // Should have compilation time assemblies
+            refsDirectory.Should().HaveFile("System.IO.dll");
+            // Libraries in which lib==ref should be deduped
+            publishCommand.GetOutputDirectory().Should().NotHaveFile("TestLibrary.dll");
+        }
+
+
         [Fact]
         public void CompilationFailedTest()
         {
