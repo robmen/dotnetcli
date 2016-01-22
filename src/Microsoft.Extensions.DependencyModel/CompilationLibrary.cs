@@ -1,6 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.Extensions.PlatformAbstractions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +13,8 @@ namespace Microsoft.Extensions.DependencyModel
     {
         private static Lazy<Assembly> _entryAssembly = new Lazy<Assembly>(GetEntryAssembly);
 
-        private static string _nugetPackages = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+        private static string _nugetPackages = Environment.GetEnvironmentVariable("NUGET_PACKAGES") ?? GetDefaultPackageDirectory();
+
         private static string _packageCache = Environment.GetEnvironmentVariable("DOTNET_PACKAGES_CACHE");
 
         public CompilationLibrary(string libraryType, string packageName, string version, string hash, string[] assemblies, Dependency[] dependencies, bool serviceable)
@@ -123,6 +125,24 @@ namespace Microsoft.Extensions.DependencyModel
                 return true;
             }
             return false;
+        }
+
+        private static string GetDefaultPackageDirectory()
+        {
+            string basePath;
+            if (PlatformServices.Default.Runtime.OperatingSystemPlatform == Platform.Windows)
+            {
+                basePath = Environment.GetEnvironmentVariable("USERPROFILE");
+            }
+            else
+            {
+                basePath = Environment.GetEnvironmentVariable("HOME");
+            }
+            if (string.IsNullOrEmpty(basePath))
+            {
+                return null;
+            }
+            return Path.Combine(basePath, ".nuget", "packages");
         }
 
         private static Assembly GetEntryAssembly()
