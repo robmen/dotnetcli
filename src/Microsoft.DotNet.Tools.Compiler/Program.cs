@@ -259,18 +259,6 @@ namespace Microsoft.DotNet.Tools.Compiler
                 }
 
                 compilerArgs.Add($"--resource:\"{depsJsonFile},{context.ProjectFile.Name}.deps.json\"");
-
-                var refsFolder = Path.Combine(outputPath, "refs");
-                if (Directory.Exists(refsFolder))
-                {
-                    Directory.Delete(refsFolder, true);
-                }
-
-                Directory.CreateDirectory(refsFolder);
-                foreach (var reference in references)
-                {
-                    File.Copy(reference, Path.Combine(refsFolder, Path.GetFileName(reference)));
-                }
             }
 
             if (!AddNonCultureResources(context.ProjectFile, compilerArgs, intermediateOutputPath))
@@ -377,7 +365,7 @@ namespace Microsoft.DotNet.Tools.Compiler
                     .Execute();
             }
         }
-        
+
         private static void CopyExport(string outputPath, LibraryExport export)
         {
             CopyFiles(export.RuntimeAssemblies, outputPath);
