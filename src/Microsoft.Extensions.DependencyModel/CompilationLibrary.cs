@@ -33,27 +33,19 @@ namespace Microsoft.Extensions.DependencyModel
             string basePath;
             string fullName;
 
-            if (TryResolvePackagePath(out basePath))
+            if (PackageName == entryAssemblyName)
             {
-                foreach (var assembly in Assemblies)
-                {
-                    if (!TryResolveAssemblyFile(basePath, assembly, out fullName))
-                    {
-                        throw new InvalidOperationException($"Can not find assembly file at '{fullName}'");
-                    }
-                    yield return fullName;
-                }
+                return entryAssembly.Location;
             }
-            else
-            {
-                var appBase = Path.GetDirectoryName(entryAssembly.Location);
-                var refsPath = Path.Combine(appBase, "refs");
-                var checkRefs = Directory.Exists(refsPath);
 
+            var appBase = Path.GetDirectoryName(entryAssembly.Location);
+            var hasRefs = Path.Combine(appBase, "refs");
+            if (hasRefs)
+            {
                 foreach (var assembly in Assemblies)
                 {
                     var assemblyFile = Path.GetFileName(assembly);
-                    if (checkRefs && TryResolveAssemblyFile(refsPath, assemblyFile, out fullName))
+                    if (checkRefs && TryResolveAssemblyFile(hasRefs, assemblyFile, out fullName))
                     {
                         yield return fullName;
                     }
@@ -66,10 +58,21 @@ namespace Microsoft.Extensions.DependencyModel
                         var errorMessage = $"Can not find assembly file {assemblyFile} at '{basePath}'";
                         if (checkRefs)
                         {
-                            errorMessage += $", '{refsPath}'";
+                            errorMessage += $", '{hasRefs}'";
                         }
                         throw new InvalidOperationException(errorMessage);
                     }
+                }
+            }
+            else if (TryResolvePackagePath(out basePath))
+            {
+                foreach (var assembly in Assemblies)
+                {
+                    if (!TryResolveAssemblyFile(basePath, assembly, out fullName))
+                    {
+                        throw new InvalidOperationException($"Can not find assembly file at '{fullName}'");
+                    }
+                    yield return fullName;
                 }
             }
         }
