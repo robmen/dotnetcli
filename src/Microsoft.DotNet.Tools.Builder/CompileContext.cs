@@ -149,7 +149,7 @@ namespace Microsoft.DotNet.Tools.Build
             {
                 Reporter.Verbose.WriteLine($"  {File.GetLastWriteTime(newInput)}: {newInput}");
             }
-            
+
             Reporter.Verbose.WriteLine();
 
             return true;
@@ -170,9 +170,9 @@ namespace Microsoft.DotNet.Tools.Build
             {
                 Reporter.Verbose.WriteLine($" {missing}");
             }
-            
-            Reporter.Output.WriteLine();;
-            
+
+            Reporter.Output.WriteLine(); ;
+
             return true;
         }
 
@@ -398,10 +398,10 @@ namespace Microsoft.DotNet.Tools.Build
         // ensures that all paths are files
         // ensures no missing inputs
         public static CompilerIO GetCompileIO(
-            ProjectContext project, 
-            string buildConfiguration, 
+            ProjectContext project,
+            string buildConfiguration,
             string outputPath,
-            string intermediaryOutputPath, 
+            string intermediaryOutputPath,
             ProjectDependenciesFacade dependencies)
         {
             var compilerIO = new CompilerIO(new List<string>(), new List<string>());
