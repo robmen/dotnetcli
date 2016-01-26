@@ -164,7 +164,7 @@ namespace Microsoft.DotNet.Tools.Build
                 return false;
             }
 
-            Reporter.Output.WriteLine($"Project {project.ProjectName()} will be compiled because expected {itemsType} are missing:");
+            Reporter.Output.WriteLine($"Project {project.ProjectName()} will be compiled because expected {itemsType} are missing.");
 
             foreach (var missing in missingItems)
             {
