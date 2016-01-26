@@ -274,7 +274,7 @@ namespace Microsoft.DotNet.Tools.Build
             var args = new List<string>();
 
             args.Add("--framework");
-            args.Add("{projectDependency.Framework}");
+            args.Add($"{projectDependency.Framework}");
             args.Add("--configuration");
             args.Add(_args.ConfigValue);
             args.Add(projectDependency.Project.ProjectDirectory);
