@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.IO;
+using System.Runtime.InteropServices;
 using NuGet.Frameworks;
 
 namespace Microsoft.DotNet.ProjectModel
@@ -88,6 +89,22 @@ namespace Microsoft.DotNet.ProjectModel
             return Path.Combine(
                 GetOutputDirectoryPath(buildConfiguration),
                 _project.Name + outputExtension);
+        }
+        
+        public string GetExecutablePath(string buildConfiguration)
+        {
+            var extension = FileNameSuffixes.CurrentPlatform.Exe;
+
+            // This is the check for mono, if we're not on windows and producing outputs for
+            // the desktop framework then it's an exe
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && _framework.IsDesktop())
+            {
+                extension = FileNameSuffixes.DotNet.Exe;
+            }
+            
+            return Path.Combine(
+                GetOutputDirectoryPath(buildConfiguration),
+                _project.Name + extension);
         }
 
         public string GetPdbPath(string buildConfiguration)

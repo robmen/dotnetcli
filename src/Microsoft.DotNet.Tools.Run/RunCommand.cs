@@ -112,7 +112,7 @@ namespace Microsoft.DotNet.Tools.Run
             }
 
             // Now launch the output and give it the results
-            var outputName = _context.GetOutputPathCalculator(tempDir).GetAssemblyPath(Configuration);
+            var outputName = _context.GetOutputPathCalculator(tempDir).GetExecutablePath(Configuration);
 
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
