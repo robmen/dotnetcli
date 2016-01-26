@@ -283,7 +283,7 @@ namespace Microsoft.DotNet.Tools.Compiler
             var compilerName = CompilerUtil.ResolveCompilerName(context);
 
             // Write RSP file
-            var rsp = Path.Combine(intermediateOutputPath, $"dotnet-compile.{context.ProjectFile.Name}.rsp");
+            var rsp = Path.Combine(intermediateOutputPath, $"dotnet-compile.rsp");
             File.WriteAllLines(rsp, compilerArgs);
 
             // Run pre-compile event
