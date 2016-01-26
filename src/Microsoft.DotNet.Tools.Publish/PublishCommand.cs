@@ -128,12 +128,6 @@ namespace Microsoft.DotNet.Tools.Publish
 
             foreach (var export in exporter.GetAllExports())
             {
-                // Skip copying project references
-                if (export.Library is ProjectDescription)
-                {
-                    continue;
-                }
-
                 Reporter.Verbose.WriteLine($"Publishing {export.Library.Identity.ToString().Green().Bold()} ...");
 
                 PublishFiles(export.RuntimeAssemblies, outputPath, false);
