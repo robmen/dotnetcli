@@ -10,7 +10,10 @@ namespace Microsoft.DotNet.ProjectModel
     {
         private const string ObjDirectoryName = "obj";
 
-        private readonly ProjectContext _project;
+        private readonly Project _project;
+        private readonly NuGetFramework _framework;
+
+        private readonly string _runtimeIdentifier;
 
         /// <summary>
         /// Unaltered output path. Either what is passed in in the constructor, or the project directory.
@@ -20,10 +23,14 @@ namespace Microsoft.DotNet.ProjectModel
         public string BaseCompilationOutputPath { get; }
 
         public OutputPathCalculator(
-            ProjectContext project,
+            Project project,
+            NuGetFramework framework,
+            string runtimeIdentifier,
             string baseOutputPath)
         {
             _project = project;
+            _framework = framework;
+            _runtimeIdentifier = runtimeIdentifier;
 
             BaseOutputPath = string.IsNullOrWhiteSpace(baseOutputPath) ? _project.ProjectDirectory : baseOutputPath;
 
@@ -32,17 +39,23 @@ namespace Microsoft.DotNet.ProjectModel
                 : baseOutputPath;
         }
 
-        public string GetCompilationOutputPath(string buildConfiguration)
+        public string GetOutputDirectoryPath(string buildConfiguration)
         {
             var outDir = Path.Combine(
-                BaseCompilationOutputPath,
+                _project.ProjectDirectory,
+                DirectoryNames.Bin,
                 buildConfiguration,
-                _project.TargetFramework.GetTwoDigitShortFolderName());
+                _framework.GetShortFolderName());
+
+            if (!string.IsNullOrEmpty(_runtimeIdentifier))
+            {
+                outDir = Path.Combine(outDir, _runtimeIdentifier);
+            }
 
             return outDir;
         }
 
-        public string GetIntermediateOutputPath(string buildConfiguration, string intermediateOutputValue)
+        public string GetIntermediateOutputDirectoryPath(string buildConfiguration, string intermediateOutputValue)
         {
             string intermediateOutputPath;
 
@@ -52,7 +65,7 @@ namespace Microsoft.DotNet.ProjectModel
                     BaseOutputPath,
                     ObjDirectoryName,
                     buildConfiguration,
-                    _project.TargetFramework.GetTwoDigitShortFolderName());
+                    _framework.GetTwoDigitShortFolderName());
             }
             else
             {
@@ -60,6 +73,28 @@ namespace Microsoft.DotNet.ProjectModel
             }
 
             return intermediateOutputPath;
+        }
+        
+        public string GetAssemblyPath(string buildConfiguration)
+        {
+            var compilationOptions = _project.GetCompilerOptions(_framework, buildConfiguration);
+            var outputExtension = FileNameSuffixes.DotNet.DynamicLib;
+
+            if (_framework.IsDesktop() && compilationOptions.EmitEntryPoint.GetValueOrDefault())
+            {
+                outputExtension = FileNameSuffixes.DotNet.Exe;
+            }
+
+            return Path.Combine(
+                GetOutputDirectoryPath(buildConfiguration),
+                _project.Name + outputExtension);
+        }
+
+        public string GetPdbPath(string buildConfiguration)
+        {
+            return Path.Combine(
+                GetOutputDirectoryPath(buildConfiguration),
+                _project.Name + FileNameSuffixes.DotNet.ProgramDatabase);
         }
     }
 }

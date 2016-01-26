@@ -83,7 +83,7 @@ namespace Microsoft.DotNet.Tools.Publish
 
             var options = context.ProjectFile.GetCompilerOptions(context.TargetFramework, configuration);
             var outputPathCalculator = context.GetOutputPathCalculator(baseOutputPath);
-            var outputPath = outputPathCalculator.GetCompilationOutputPath(configuration);
+            var outputPath = outputPathCalculator.GetOutputDirectoryPath(configuration);
 
             var contextVariables = new Dictionary<string, string>
             {
