@@ -42,9 +42,7 @@ namespace Microsoft.DotNet.ProjectModel
 
         public string GetOutputDirectoryPath(string buildConfiguration)
         {
-            var outDir = Path.Combine(
-                _project.ProjectDirectory,
-                DirectoryNames.Bin,
+            var outDir = Path.Combine(BaseCompilationOutputPath,
                 buildConfiguration,
                 _framework.GetShortFolderName());
 

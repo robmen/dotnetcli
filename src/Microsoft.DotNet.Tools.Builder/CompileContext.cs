@@ -164,14 +164,14 @@ namespace Microsoft.DotNet.Tools.Build
                 return false;
             }
 
-            Reporter.Output.WriteLine($"Project {project.GetDisplayName()} will be compiled because expected {itemsType} are missing.");
+            Reporter.Verbose.WriteLine($"Project {project.GetDisplayName()} will be compiled because expected {itemsType} are missing.");
 
             foreach (var missing in missingItems)
             {
                 Reporter.Verbose.WriteLine($" {missing}");
             }
 
-            Reporter.Output.WriteLine(); ;
+            Reporter.Verbose.WriteLine(); ;
 
             return true;
         }

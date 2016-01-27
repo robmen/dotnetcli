@@ -77,39 +77,39 @@ namespace Microsoft.DotNet.Tools.Publish
         /// <param name="configuration">Debug or Release</param>
         /// <param name="nativeSubdirectories"></param>
         /// <returns>Return 0 if successful else return non-zero</returns>
-        private static bool PublishProjectContext(ProjectContext context, string baseOutputPath, string configuration, bool nativeSubdirectories)
+        private static bool PublishProjectContext(ProjectContext context, string outputPath, string configuration, bool nativeSubdirectories)
         {
             Reporter.Output.WriteLine($"Publishing {context.RootProject.Identity.Name.Yellow()} for {context.TargetFramework.DotNetFrameworkName.Yellow()}/{context.RuntimeIdentifier.Yellow()}");
 
             var options = context.ProjectFile.GetCompilerOptions(context.TargetFramework, configuration);
-            var outputPathCalculator = context.GetOutputPathCalculator(baseOutputPath);
-            var outputPath = outputPathCalculator.GetOutputDirectoryPath(configuration);
+            
+            if (string.IsNullOrEmpty(outputPath))
+            {
+                outputPath = context.GetOutputPathCalculator().GetOutputDirectoryPath(configuration);
+            }
 
             var contextVariables = new Dictionary<string, string>
             {
                 { "publish:ProjectPath", context.ProjectDirectory },
                 { "publish:Configuration", configuration },
                 { "publish:OutputPath", outputPath },
-                { "publish:PublishOutputPath", outputPathCalculator.BaseCompilationOutputPath },
                 { "publish:Framework", context.TargetFramework.Framework },
                 { "publish:Runtime", context.RuntimeIdentifier },
             };
 
             RunScripts(context, ScriptNames.PrePublish, contextVariables);
 
-            if (!Directory.Exists(outputPathCalculator.BaseCompilationOutputPath))
+            if (!Directory.Exists(outputPath))
             {
-                Directory.CreateDirectory(outputPathCalculator.BaseCompilationOutputPath);
+                Directory.CreateDirectory(outputPath);
             }
 
             // Compile the project (and transitively, all it's dependencies)
-            var result = Command.Create("dotnet-build", 
+            var result = Command.Create("dotnet-build",
                 new string[] {
-                    "--framework", 
+                    "--framework",
                     $"{context.TargetFramework.DotNetFrameworkName}",
-                    "--output", 
-                    $"{outputPathCalculator.BaseCompilationOutputPath}",
-                    "--configuration", 
+                    "--configuration",
                     $"{configuration}",
                     "--no-host",
                     $"{context.ProjectFile.ProjectDirectory}"
